@@ -1,13 +1,12 @@
-import { Router } from 'express';
-
+import { Router } from "express";
 
 export default (app: Router) => {
-  const router = Router()
-  app.use("/", router)    
+  const router = Router();
+  app.use("/", router);
 
-  router.get('', (_req, res) => {
-    res.send({"home": "Hello from the bangtang boiiissssss"});
+  router.get("", (_req, res) => {
+    res.send({ home: "Hello from the bangtang boiiissssss" });
   });
-      
-  return app;    
-}
+
+  return app;
+};
