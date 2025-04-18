@@ -1,6 +1,6 @@
 import express from "express";
-import home from "./routes/home.js";
-import games from "./routes/games.js";
+import home from "./routes/home_controller.js";
+import games from "./routes/game_controller.js";
 
 export default (() => {
   const PORT = process.env.PORT || 3000;
