@@ -3,8 +3,11 @@ import home from "./routes/home_controller.js";
 import games from "./routes/game_controller.js";
 
 export default (() => {
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT || 3000;  
+  // Browser security measure that allows the front-end to connect
+  const cors = require('cors');
   const app = express();
+  app.use(cors());
 
   home(app);
   games(app);

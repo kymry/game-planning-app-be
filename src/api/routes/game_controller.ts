@@ -13,7 +13,9 @@ export default (app: Router) => {
   });
 
   router.post("/create", (_req, res) => {
-    createGame("test-name", "test-description");
+    createGame("Catan", "Catan description");
+    createGame("MTG", " MTG description");
+    createGame("Scrabble", "Scrabble description");
 
     res.send({
       status: 200,
