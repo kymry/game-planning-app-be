@@ -1,18 +1,18 @@
 import { Expose } from "class-transformer";
 
 export class GameDto {
-  @Expose
+  @Expose()
   title: string;
-  @Expose
+  @Expose()
   year: number;
-  @Expose
+  @Expose()
   max_players: number;
-  @Expose
+  @Expose()
   min_players: number;
-  @Expose
+  @Expose()
   min_time: number;
-  @Expose
+  @Expose()
   max_time: number;
-  @Expose
+  @Expose()
   type: string;
 }
