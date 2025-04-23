@@ -1,29 +1,39 @@
 import { Router } from "express";
 import { listGames, createGame, deleteGame } from "../../services/game_service";
+import { GameDto } from "../../models/game/gameDto";
+import { plainToClass } from "class-transformer";
 
 export default (app: Router) => {
   const router = Router();
   app.use("/api/games", router);
 
-  router.get("/list", async (_req, res) => {
+  router.get("/list", async (req, res) => {
     const games = await listGames();
     res.send({
       games: games,
     });
   });
 
-  router.post("/create", (_req, res) => {
-    createGame("Catan", "Catan description");
-    createGame("MTG", " MTG description");
-    createGame("Scrabble", "Scrabble description");
-
-    res.send({
-      status: 200,
+  router.post("/create", (req, res) => {
+    const gameDto: GameDto = plainToClass(GameDto, req.body, {
+      excludeExtraneousValues: true,
     });
+
+    try {
+      createGame(gameDto);
+      res.send({
+        status: 200,
+      });
+    } catch (error) {
+      res.send({
+        status: 500,
+        error,
+      });
+    }
   });
 
-  router.delete("/delete/:id", async (_req, res) => {
-    const gameId = _req.params.id
+  router.delete("/delete/:id", async (req, res) => {
+    const gameId = req.params.id;
     deleteGame(gameId);
 
     res.send({
