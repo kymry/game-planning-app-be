@@ -1,5 +1,5 @@
 import Game from "../models/game/game";
-import { GameDto } from "../models/game/gameDto";
+import { GameDto } from "../models/game/game_dto";
 
 const initialize = async () => {
   return await Game();

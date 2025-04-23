@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { listGames, createGame, deleteGame } from "../../services/game_service";
-import { GameDto } from "../../models/game/gameDto";
+import { GameDto } from "../../models/game/game_dto";
 import { plainToClass } from "class-transformer";
 
 export default (app: Router) => {
