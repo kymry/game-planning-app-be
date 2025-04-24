@@ -1,20 +1,22 @@
 import { Sequelize, DataTypes } from "sequelize";
 import Database from "../../config/database";
 
-const Event = async () => {
+const EventGame = async () => {
   const database: Sequelize = Database();
-  const event = database.define(
-    "event",
+  const event_game = database.define(
+    "event_game",
     {
-      title: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      description: {
+      event_id: {
         type: DataTypes.INTEGER,
+        allowNull: false
+      },
+      game_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
       }
     }
   );
+
   try {
     await database.sync();
     console.log("The table for Event model was upserted");
@@ -22,7 +24,7 @@ const Event = async () => {
     console.log(error);
   }
 
-  return event;
+  return event_game;
 };
 
-export default Event;
+export default EventGame;

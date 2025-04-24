@@ -12,10 +12,9 @@ const listEvents = async () => {
 
 const createEvent = async (dto: EventDto) => {
   const event = await initialize();
-  return event.create({
+  const eventRecord = event.create({
     title: dto.title,
-    description: dto.description,
-    datetimes: dto.datetimes
+    description: dto.description
   });
 };
 

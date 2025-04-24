@@ -7,4 +7,6 @@ export class EventDto {
   description: string;
   @Expose()
   datetimes: Array<Date>;
+  @Expose()
+  games: Array<string>;
 }

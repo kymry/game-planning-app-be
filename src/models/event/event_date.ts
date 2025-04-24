@@ -1,17 +1,18 @@
 import { Sequelize, DataTypes } from "sequelize";
 import Database from "../../config/database";
 
-const Event = async () => {
+const EventDate = async () => {
   const database: Sequelize = Database();
-  const event = database.define(
-    "event",
+  const event_date = database.define(
+    "event_date",
     {
-      title: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      description: {
+      event_id: {
         type: DataTypes.INTEGER,
+        allowNull: false
+      },
+      date: {
+        type: DataTypes.STRING,
+        allowNull: false
       }
     }
   );
@@ -22,7 +23,7 @@ const Event = async () => {
     console.log(error);
   }
 
-  return event;
+  return event_date;
 };
 
-export default Event;
+export default EventDate;
