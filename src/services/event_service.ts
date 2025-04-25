@@ -9,7 +9,7 @@ const listEvents = async () => {
   return eventRepo.findAll();
 };
 
-const getEvent = async (id: number) => {
+const getEvent = async (id: number): Promise<EventDto> => {
   const eventRepo = await Event();
   const eventGameRepo = await EventGame();
   const eventDateRepo = await EventDate();
@@ -32,8 +32,8 @@ const getEvent = async (id: number) => {
     return relatedDate.toJSON().date;
   });
 
-  const relatedGamesList: Array<string> = relatedGames.map((game) => {
-    return game.toJSON().id;
+  const relatedGamesList: Array<number> = relatedGames.map((game) => {
+    return game.toJSON().game_id;
   });
 
   return new EventDto(
@@ -75,10 +75,19 @@ const createEvent = async (dto: EventDto) => {
 
 const deleteEvent = async (id) => {
   const eventRepo = await Event();
-  return eventRepo.destroy({
-    where: {
-      id: id,
-    },
+  const eventGameRepo = await EventGame();
+  const eventDateRepo = await EventDate();
+
+  eventRepo.destroy({
+    where: { id: id },
+  });
+
+  eventGameRepo.destroy({
+    where: { event_id: id },
+  });
+
+  eventDateRepo.destroy({
+    where: { event_id: id },
   });
 };
 

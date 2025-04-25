@@ -8,13 +8,13 @@ export class EventDto {
   @Expose()
   datetimes: Array<string>;
   @Expose()
-  games: Array<string>;
+  games: Array<number>;
 
   constructor(
     title: string,
     description: string,
     datetimes: Array<string>,
-    games: Array<string>,
+    games: Array<number>,
   ) {
     this.title = title;
     this.description = description;

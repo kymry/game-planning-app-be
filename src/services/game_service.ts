@@ -1,3 +1,4 @@
+import { Model } from "sequelize";
 import Game from "../models/game/game";
 import { GameDto } from "../models/game/game_dto";
 
