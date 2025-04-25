@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { listEvents, createEvent, deleteEvent, getEvent } from "../../services/event_service";
+import {
+  listEvents,
+  createEvent,
+  deleteEvent,
+  getEvent,
+} from "../../services/event_service";
 import { EventDto } from "../../models/event/event_dto";
 import { plainToClass } from "class-transformer";
 import { Request, Response } from "express";
