@@ -1,11 +1,14 @@
+import { EventModel } from "../models/event/event";
+import { EventDateModel } from "../models/event/event_date/event_date";
 import { EventDto } from "../models/event/event_dto";
 import { Model, ModelStatic } from "sequelize";
+import { EventGameModel } from "../models/event/event_game/event_game";
 
 export class EventService {
   constructor(
-    private eventRepo: ModelStatic<Model>,
-    private eventDateRepo: ModelStatic<Model>,
-    private eventGameRepo: ModelStatic<Model>,
+    private eventRepo: typeof EventModel,
+    private eventDateRepo: typeof EventDateModel,
+    private eventGameRepo: typeof EventGameModel,
   ) {}
 
   listEvents = () => {
@@ -13,7 +16,7 @@ export class EventService {
   };
 
   getEvent = async (id: number): Promise<EventDto> => {
-    const eventRecord: Model = await this.eventRepo.findOne({
+    const eventRecord = await this.eventRepo.findOne({
       where: { id: id },
     });
 
@@ -29,8 +32,6 @@ export class EventService {
       where: { event_id: id },
     });
 
-    const eventRecordJson = eventRecord.toJSON();
-
     const datesList: Array<string> = dates.map((relatedDate) => {
       return relatedDate.toJSON().date;
     });
@@ -40,30 +41,29 @@ export class EventService {
     });
 
     return new EventDto(
-      eventRecordJson.title,
-      eventRecordJson.description,
+      eventRecord.title,
+      eventRecord.description,
       datesList,
       relatedGamesList,
     );
   };
 
   createEvent = async (dto: EventDto) => {
-    const eventRecord: Model = await this.eventRepo.create({
+    const eventRecord = await this.eventRepo.create({
       title: dto.title,
       description: dto.description,
     });
 
-    const eventJson = eventRecord.toJSON();
-
+    
     await Promise.all(
       dto.games.map((game_id) => {
-        this.eventGameRepo.create({ event_id: eventJson.id, game_id: game_id });
+        this.eventGameRepo.create({ event_id: eventRecord.id, game_id: game_id });
       }),
     );
 
     await Promise.all(
       dto.datetimes.map((date) => {
-        this.eventDateRepo.create({ event_id: eventJson.id, date: date });
+        this.eventDateRepo.create({ event_id: eventRecord.id, date: date });
       }),
     );
 
