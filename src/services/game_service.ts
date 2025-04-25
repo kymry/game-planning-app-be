@@ -22,7 +22,7 @@ const createGame = async (dto: GameDto) => {
   });
 };
 
-const deleteGame = async (id) => {
+const deleteGame = async (id: number) => {
   const game = await initialize();
   return game.destroy({
     where: {
