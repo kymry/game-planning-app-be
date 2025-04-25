@@ -1,45 +1,48 @@
 import { describe, it } from "mocha";
 import { assert } from "chai";
-import {
-  listEvents,
-  createEvent,
-  deleteEvent,
-  getEvent,
-} from "../../src/services/event_service";
+import { EventService } from "../../src/services/event_service";
 import { EventDto } from "../../src/models/event/event_dto";
+import { bootstrap } from "../../src/api/bootstrap";
 
-function createTestEventDto(): EventDto {
-  return new EventDto(
-    "TEST TITLE",
-    "TEST DESCRIPTION",
-    ["2025-01-01T10:00:00Z", "2025-01-02T12:00:00Z"],
-    [101, 102],
-  );
-}
+describe("Event Service Tests", function () {
+  let eventService: EventService;
+  function createDto() {
+    return new EventDto(
+      "TEST TITLE",
+      "TEST DESCRIPTION",
+      ["2025-01-01T10:00:00Z", "2025-01-02T12:00:00Z"],
+      [101, 102],
+    );
+  }
 
-describe("Event Services", function () {
+  // Use before hook to setup async code
+  before(async () => {
+    const { Event, EventDate, EventGame } = await bootstrap();
+    eventService = new EventService(Event, EventDate, EventGame);
+  });
+
   it("should return a list of events", async () => {
-    const list = await listEvents();
+    const list = await eventService.listEvents();
     assert.isArray(list);
   });
 
   it("should create an event", async () => {
-    const dto = createTestEventDto();
-    const result = await createEvent(dto);
-    
+    const dto = createDto()
+    const result = await eventService.createEvent(dto);
+
     assert.isOk(result);
     assert.equal(result.toJSON().title, dto.title);
 
     // Cleanup
-    await deleteEvent(result.toJSON().id);
+    eventService.deleteEvent(result.id);
   });
 
   it("should retrieve an event by ID", async () => {
-    const dto = createTestEventDto();
-    const created = await createEvent(dto);
-    const id = created.toJSON().id;
+    const dto = createDto()
+    const created = await eventService.createEvent(dto);
+    const id = created.id;
 
-    const retrieved = await getEvent(id);
+    const retrieved = await eventService.getEvent(id);
 
     assert.equal(retrieved.title, dto.title);
     assert.equal(retrieved.description, dto.description);
@@ -47,6 +50,6 @@ describe("Event Services", function () {
     assert.deepEqual(retrieved.games, dto.games);
 
     // Cleanup
-    await deleteEvent(id);
+    eventService.deleteEvent(id);
   });
 });
