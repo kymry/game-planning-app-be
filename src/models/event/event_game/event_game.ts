@@ -1,27 +1,45 @@
-import { Sequelize, DataTypes } from "sequelize";
-import Database from "../../../config/database";
+import { Sequelize, DataTypes, Optional, Model } from "sequelize";
 
-const EventGame = async () => {
-  const database: Sequelize = Database();
-  const event_game = database.define("event_game", {
-    event_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+export interface EventGameAttributes {
+  id: number;
+  event_id: number;
+  game_id: number;
+}
+
+export class EventGameModel
+  extends Model<EventGameAttributes, Optional<EventGameAttributes, "id">>
+  implements EventGameAttributes
+{
+  public id!: number;
+  public event_id!: number;
+  public game_id!: number;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+}
+
+export const initEventGameModel = (sequelize: Sequelize) => {
+  EventGameModel.init(
+    {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      game_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
+      event_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
     },
-    game_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+    {
+      tableName: "event_games",
+      sequelize,
     },
-  });
+  );
 
-  try {
-    await database.sync();
-    console.log("The table for Event model was upserted");
-  } catch (error) {
-    console.log(error);
-  }
-
-  return event_game;
+  return EventGameModel;
 };
-
-export default EventGame;

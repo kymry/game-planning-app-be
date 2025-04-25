@@ -1,95 +1,78 @@
-import Event from "../models/event/event";
-import EventDate from "../models/event/event_date/event_date";
-import EventGame from "../models/event/event_game/event_game";
 import { EventDto } from "../models/event/event_dto";
-import { Model } from "sequelize";
+import { Model, ModelStatic } from "sequelize";
 
-const listEvents = async () => {
-  const eventRepo = await Event();
-  return eventRepo.findAll();
-};
+export class EventService {
+  constructor(
+    private eventRepo: ModelStatic<Model>,
+    private eventDateRepo: ModelStatic<Model>,
+    private eventGameRepo: ModelStatic<Model>,
+  ) {}
 
-const getEvent = async (id: number): Promise<EventDto> => {
-  const eventRepo = await Event();
-  const eventGameRepo = await EventGame();
-  const eventDateRepo = await EventDate();
+  listEvents = () => {
+    return this.eventRepo.findAll();
+  };
 
-  const eventRecord: Model = await eventRepo.findOne({
-    where: { id: id },
-  });
-
-  const relatedGames: Array<Model> = await eventGameRepo.findAll({
-    where: { event_id: id },
-  });
-
-  const dates: Array<Model> = await eventDateRepo.findAll({
-    where: { event_id: id },
-  });
-
-  const eventRecordJson = eventRecord.toJSON();
-
-  const datesList: Array<string> = dates.map((relatedDate) => {
-    return relatedDate.toJSON().date;
-  });
-
-  const relatedGamesList: Array<number> = relatedGames.map((game) => {
-    return game.toJSON().game_id;
-  });
-
-  return new EventDto(
-    eventRecordJson.title,
-    eventRecordJson.description,
-    datesList,
-    relatedGamesList,
-  );
-};
-
-const createEvent = async (dto: EventDto) => {
-  const eventRepo = await Event();
-  const eventGameRepo = await EventGame();
-  const eventDateRepo = await EventDate();
-
-  const eventRecord: Model = await eventRepo.create({
-    title: dto.title,
-    description: dto.description,
-  });
-
-  const eventJson = eventRecord.toJSON();
-
-  dto.games.forEach(async (game) => {
-    await eventGameRepo.create({
-      event_id: eventJson.id,
-      game_id: game,
+  getEvent = async (id: number): Promise<EventDto> => {
+    const eventRecord: Model = await this.eventRepo.findOne({
+      where: { id: id },
     });
-  });
 
-  dto.datetimes.forEach(async (date_time) => {
-    await eventDateRepo.create({
-      event_id: eventJson.id,
-      date: date_time,
+    if (eventRecord == null) {
+      throw Error(`this event doesn't exist: ${id}`);
+    }
+
+    const relatedGames: Array<Model> = await this.eventGameRepo.findAll({
+      where: { event_id: id },
     });
-  });
 
-  return eventRecord;
-};
+    const dates: Array<Model> = await this.eventDateRepo.findAll({
+      where: { event_id: id },
+    });
 
-const deleteEvent = async (id) => {
-  const eventRepo = await Event();
-  const eventGameRepo = await EventGame();
-  const eventDateRepo = await EventDate();
+    const eventRecordJson = eventRecord.toJSON();
 
-  eventRepo.destroy({
-    where: { id: id },
-  });
+    const datesList: Array<string> = dates.map((relatedDate) => {
+      return relatedDate.toJSON().date;
+    });
 
-  eventGameRepo.destroy({
-    where: { event_id: id },
-  });
+    const relatedGamesList: Array<number> = relatedGames.map((game) => {
+      return game.toJSON().game_id;
+    });
 
-  eventDateRepo.destroy({
-    where: { event_id: id },
-  });
-};
+    return new EventDto(
+      eventRecordJson.title,
+      eventRecordJson.description,
+      datesList,
+      relatedGamesList,
+    );
+  };
 
-// Export functions
-export { listEvents, createEvent, deleteEvent, getEvent };
+  createEvent = async (dto: EventDto) => {
+    const eventRecord: Model = await this.eventRepo.create({
+      title: dto.title,
+      description: dto.description,
+    });
+
+    const eventJson = eventRecord.toJSON();
+
+    await Promise.all(
+      dto.games.map((game_id) => {
+        this.eventGameRepo.create({ event_id: eventJson.id, game_id: game_id });
+      }),
+    );
+
+    await Promise.all(
+      dto.datetimes.map((date) => {
+        this.eventDateRepo.create({ event_id: eventJson.id, date: date });
+      }),
+    );
+
+    return eventRecord;
+  };
+
+  deleteEvent = (id: number) => {
+    this.eventGameRepo.destroy({ where: { event_id: id } });
+    this.eventDateRepo.destroy({ where: { event_id: id } });
+    this.eventRepo.destroy({ where: { id: id } });
+  };
+}
