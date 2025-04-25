@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { listEvents, createEvent, deleteEvent } from "../../services/event_service";
+import { listEvents, createEvent, deleteEvent, getEvent } from "../../services/event_service";
 import { EventDto } from "../../models/event/event_dto";
 import { plainToClass } from "class-transformer";
+import { Request, Response } from "express";
 
 export default (app: Router) => {
   const router = Router();
@@ -14,7 +15,15 @@ export default (app: Router) => {
     });
   });
 
-  router.post("/create", (req, res) => {
+  router.get("/:id", async (req, res) => {
+    const eventId = req.params.id;
+    const event = await getEvent(parseInt(eventId));
+    res.send({
+      games: event,
+    });
+  });
+
+  router.post("/create", (req: Request, res: Response) => {
     const eventDto: EventDto = plainToClass(EventDto, req.body, {
       excludeExtraneousValues: true,
     });
@@ -33,8 +42,8 @@ export default (app: Router) => {
   });
 
   router.delete("/delete/:id", async (req, res) => {
-    const gameId = req.params.id;
-    deleteEvent(gameId);
+    const eventId = req.params.id;
+    deleteEvent(eventId);
 
     res.send({
       status: 200,

@@ -18,7 +18,7 @@ const EventDate = async () => {
   );
   try {
     await database.sync();
-    console.log("The table for Event model was upserted");
+    console.log("The table for Date model was upserted");
   } catch (error) {
     console.log(error);
   }

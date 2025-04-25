@@ -11,12 +11,12 @@ const Event = async () => {
         allowNull: false,
       },
       description: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
       }
     }
   );
   try {
-    await database.sync();
+    await database.sync({alter: true});
     console.log("The table for Event model was upserted");
   } catch (error) {
     console.log(error);
